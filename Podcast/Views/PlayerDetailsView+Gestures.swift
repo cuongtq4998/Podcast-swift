@@ -32,7 +32,7 @@ extension PlayerDetailsView {
     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
       self.transform = .identity
       if translation.y < -200 || velocity.y < -500 {
-        UIApplication.mainTabBarController()?.maximizePlayerDetails(episode: nil)
+          UIApplication.mainTabBarController()?.maximizePlayerDetails(episode: nil, userManual: true)
       } else {
         self.miniPlayerView.alpha = 1
         self.maximizedStackView.alpha = 0
@@ -41,7 +41,7 @@ extension PlayerDetailsView {
   }
   
   @objc func handleTapMaximize() {
-    UIApplication.mainTabBarController()?.maximizePlayerDetails(episode: nil)
+    UIApplication.mainTabBarController()?.maximizePlayerDetails(episode: nil, userManual: true)
   }
   
   @objc func handleDismissalPan(gesture: UIPanGestureRecognizer) {

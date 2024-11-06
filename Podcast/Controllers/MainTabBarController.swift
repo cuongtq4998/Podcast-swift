@@ -8,7 +8,35 @@
 
 import UIKit
 
-class MainTabBarController: UITabBarController {
+class MainTabBarController: UITabBarController, Rotatable {
+  var viewsContainer: [UIView] {
+    return [playerDetailsView]
+  }
+  
+  enum ViewCanRotation: String {
+    case inital
+    case userManualFull
+    case minizeMode
+  }
+  
+  var state: ViewCanRotation = .inital {
+    didSet {
+      print("state change: \(state.rawValue)")
+      chanegOrientaton(state: state)
+    }
+  }
+  
+  private func chanegOrientaton(state: ViewCanRotation) {
+    switch state {
+    case .inital:
+      resetToPortrait()
+    case .userManualFull:
+      setToLandscape()
+    case .minizeMode:
+      resetToPortrait()
+    }
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -26,6 +54,8 @@ class MainTabBarController: UITabBarController {
     bottomAnchorConstraint.constant = view.frame.height
     minimizedTopAnchorConstraint.isActive = true
     
+    state = .minizeMode
+    
     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
       self.view.layoutIfNeeded()
       self.tabBar.transform = .identity
@@ -34,7 +64,7 @@ class MainTabBarController: UITabBarController {
     })
   }
   
-  func maximizePlayerDetails(episode: Episode?, playlistEpisodes: [Episode] = []) {
+  func maximizePlayerDetails(episode: Episode?, playlistEpisodes: [Episode] = [], userManual: Bool = false) {
     minimizedTopAnchorConstraint.isActive = false
     maximizedTopAnchorConstraint.isActive = true
     maximizedTopAnchorConstraint.constant = 0
@@ -45,6 +75,7 @@ class MainTabBarController: UITabBarController {
     }
     
     playerDetailsView.playlistEpisodes = playlistEpisodes
+    state = !userManual ? .inital : .userManualFull
     
     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
       self.view.layoutIfNeeded()

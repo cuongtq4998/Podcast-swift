@@ -50,3 +50,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+protocol Rotatable: AnyObject {
+    func resetToPortrait()
+    func setToLandscape()
+    var viewsContainer: [UIView] { get }
+}
+
+extension Rotatable where Self: UIViewController {
+    func resetToPortrait() {
+        if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+            self.setNeedsUpdateOfSupportedInterfaceOrientations()
+        } else {
+            UIDevice.current.setValue(Int(UIInterfaceOrientation.portrait.rawValue), forKey: "orientation")
+        }
+    }
+    
+    func setToLandscape() {
+        if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeLeft))
+            self.setNeedsUpdateOfSupportedInterfaceOrientations()
+        } else {
+            UIDevice.current.setValue(Int(UIInterfaceOrientation.landscapeLeft.rawValue), forKey: "orientation")
+        }
+    }
+}
+
+extension AppDelegate {
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        if let parentViewController = window?.rootViewController as? MainTabBarController{
+            if parentViewController.state == .userManualFull  {
+                return .allButUpsideDown
+            }
+        }
+        
+        return .portrait
+    }
+}
