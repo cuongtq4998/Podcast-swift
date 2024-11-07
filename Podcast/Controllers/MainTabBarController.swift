@@ -21,7 +21,6 @@ class MainTabBarController: UITabBarController, Rotatable {
   
   var state: ViewCanRotation = .inital {
     didSet {
-      print("state change: \(state.rawValue)")
       chanegOrientaton(state: state)
     }
   }
@@ -31,7 +30,7 @@ class MainTabBarController: UITabBarController, Rotatable {
     case .inital:
       resetToPortrait()
     case .userManualFull:
-      setToLandscape()
+      break
     case .minizeMode:
       resetToPortrait()
     }
@@ -56,12 +55,10 @@ class MainTabBarController: UITabBarController, Rotatable {
     
     state = .minizeMode
     
-    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
-      self.view.layoutIfNeeded()
-      self.tabBar.transform = .identity
-      self.playerDetailsView.maximizedStackView.alpha = 0
-      self.playerDetailsView.miniPlayerView.alpha = 1
-    })
+    view.layoutIfNeeded()
+    tabBar.transform = .identity
+    playerDetailsView.maximizedStackView.alpha = 0
+    playerDetailsView.miniPlayerView.alpha = 1
   }
   
   func maximizePlayerDetails(episode: Episode?, playlistEpisodes: [Episode] = [], userManual: Bool = false) {
@@ -77,12 +74,10 @@ class MainTabBarController: UITabBarController, Rotatable {
     playerDetailsView.playlistEpisodes = playlistEpisodes
     state = !userManual ? .inital : .userManualFull
     
-    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
-      self.view.layoutIfNeeded()
-      self.tabBar.transform = CGAffineTransform(translationX: 0, y: 100)
-      self.playerDetailsView.maximizedStackView.alpha = 1
-      self.playerDetailsView.miniPlayerView.alpha = 0
-    })
+    view.layoutIfNeeded()
+    tabBar.transform = CGAffineTransform(translationX: 0, y: 100)
+    playerDetailsView.maximizedStackView.alpha = 1
+    playerDetailsView.miniPlayerView.alpha = 0
   }
   
   //MARK:- Setup Functions
@@ -110,21 +105,51 @@ class MainTabBarController: UITabBarController, Rotatable {
     let layout = UICollectionViewFlowLayout()
     let favoritesController = FavoritesController(collectionViewLayout: layout)
     viewControllers = [
-      generateNavigationController(for: PodcastsSearchController(), title: "Search", image: #imageLiteral(resourceName: "search")),
-      generateNavigationController(for: favoritesController, title: "Favorites", image: #imageLiteral(resourceName: "favorites")),
-      generateNavigationController(for: DownloadsController(), title: "Downloads", image: #imageLiteral(resourceName: "downloads"))
+      generateNavigationController(for: PodcastsSearchController(), menu: MenuItem(
+        title: "Search",
+        remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normaltv_1723520994568.png",
+        remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activetv_1723520483939.png",
+        localImage: #imageLiteral(resourceName: "search"),
+        localImageSelection: #imageLiteral(resourceName: "search"))
+      ),
+      generateNavigationController(for: favoritesController, menu: MenuItem(
+        title: "Favorites",
+        remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normalvod_1723520974422.png",
+        remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activevod_1723520974422.png",
+        localImage: #imageLiteral(resourceName: "favorites"),
+        localImageSelection: #imageLiteral(resourceName: "favorites"))
+      ),
+      generateNavigationController(for: DownloadsController(), menu: MenuItem(
+        title: "Downloads",
+        remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normalsport_1723520924752.png",
+        remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activesport_1723520571475.png",
+        localImage: #imageLiteral(resourceName: "downloads"),
+        localImageSelection: #imageLiteral(resourceName: "downloads"))
+      )
     ]
   }
   
   //MARK:- Helper Functions
   
-  fileprivate func generateNavigationController(for rootViewController: UIViewController, title: String, image: UIImage) -> UIViewController {
+  fileprivate func generateNavigationController(for rootViewController: UIViewController, menu: MenuItem) -> UIViewController {
     let navController = UINavigationController(rootViewController: rootViewController)
-    rootViewController.navigationItem.title = title
-    navController.tabBarItem.title = title
-    navController.tabBarItem.image = image
+    rootViewController.navigationItem.title = menu.title
+    navController.tabBarItem.title = menu.title
+    navController.tabBarItem.image = menu.localImage
+    navController.tabBarItem.selectedImage = menu.localImageSelection
     return navController
   }
 
   
+}
+
+struct MenuItem {
+  let title: String
+  let remoteImage: String
+  let remoteImageSelection: String
+  let localImage: UIImage
+  let localImageSelection: UIImage
+  
+  var remoteUIImage: UIImage?
+  var remoteUIImageSelection: UIImage?
 }

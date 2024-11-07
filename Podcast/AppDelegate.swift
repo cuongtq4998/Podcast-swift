@@ -82,10 +82,12 @@ extension AppDelegate {
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         if let parentViewController = window?.rootViewController as? MainTabBarController{
             if parentViewController.state == .userManualFull  {
+                print("Device will be rotation...")
                 return .allButUpsideDown
             }
         }
         
+        print("Device will not be rotation...")
         return .portrait
     }
 }
