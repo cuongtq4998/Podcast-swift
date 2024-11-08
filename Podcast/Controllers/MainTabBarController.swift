@@ -153,22 +153,4 @@ class MainTabBarController: UITabBarController, Rotatable {
     navController.tabBarItem.selectedImage = menu.localImageSelection
     return navController
   }
-
-  
-}
-
-struct MenuItem {
-  let title: String
-  let remoteImage: String
-  let remoteImageSelection: String
-  let localImage: UIImage
-  let localImageSelection: UIImage
-  
-  var remoteUIImage: UIImage?
-  var remoteUIImageSelection: UIImage?
-}
-
-struct ControllerTabItem {
-  let controller: UIViewController
-  var menuItem: MenuItem
 }
