@@ -214,6 +214,7 @@ class PlayerDetailsView: UIView {
     setupInterruptionObserver()
     observePlayerCurrentTime()
     observeBoundaryTime()
+    pauseButtonUI()
   }
   
   fileprivate func setupInterruptionObserver() {
@@ -310,19 +311,29 @@ class PlayerDetailsView: UIView {
   }
   
   @objc func handlePlayPause() {
+    guard episode != nil else { return }
+    
     if player.timeControlStatus == .paused {
       player.play()
-      playPauseButton.setImage(#imageLiteral(resourceName: "pause"), for: .normal)
-      miniPlayPauseButton.setImage(#imageLiteral(resourceName: "pause"), for: .normal)
+      playButtonUI()
       enlargeEpisodeImageView()
       self.setupElapsedTime(playbackRate: 1)
     } else {
       player.pause()
-      playPauseButton.setImage(#imageLiteral(resourceName: "play"), for: .normal)
-      miniPlayPauseButton.setImage(#imageLiteral(resourceName: "play"), for: .normal)
+      pauseButtonUI()
       shrinkEpisodeImageView()
       self.setupElapsedTime(playbackRate: 0)
     }
+  }
+  
+  private func pauseButtonUI() {
+    playPauseButton.setImage(#imageLiteral(resourceName: "play"), for: .normal)
+    miniPlayPauseButton.setImage(#imageLiteral(resourceName: "play"), for: .normal)
+  }
+  
+  private func playButtonUI() {
+    playPauseButton.setImage(#imageLiteral(resourceName: "pause"), for: .normal)
+    miniPlayPauseButton.setImage(#imageLiteral(resourceName: "pause"), for: .normal)
   }
   
   @IBOutlet weak var authorLabel: UILabel!

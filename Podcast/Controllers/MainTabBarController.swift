@@ -19,6 +19,32 @@ class MainTabBarController: UITabBarController, Rotatable {
     case minizeMode
   }
   
+  var menuItems: [ControllerTabItem] = [
+    ControllerTabItem(controller: PodcastsSearchController(), menuItem: MenuItem(
+      title: "Search",
+      remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normaltv_1723520994568.png",
+      remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activetv_1723520483939.png",
+      localImage: #imageLiteral(resourceName: "search"),
+      localImageSelection: #imageLiteral(resourceName: "search"))
+    ),
+    
+    ControllerTabItem(controller: FavoritesController(collectionViewLayout: UICollectionViewFlowLayout()), menuItem: MenuItem(
+      title: "Favorites",
+      remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normalvod_1723520974422.png",
+      remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activevod_1723520974422.png",
+      localImage: #imageLiteral(resourceName: "favorites"),
+      localImageSelection: #imageLiteral(resourceName: "favorites"))
+    ),
+    
+    ControllerTabItem(controller: DownloadsController(), menuItem: MenuItem(
+      title: "Downloads",
+      remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normalsport_1723520924752.png",
+      remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activesport_1723520571475.png",
+      localImage: #imageLiteral(resourceName: "downloads"),
+      localImageSelection: #imageLiteral(resourceName: "downloads"))
+    )
+  ]
+  
   var state: ViewCanRotation = .inital {
     didSet {
       chanegOrientaton(state: state)
@@ -39,11 +65,21 @@ class MainTabBarController: UITabBarController, Rotatable {
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    if #available(iOS 18.0, *) {
+      // Add the tab bar as a subview since its hierarchy has changed in iOS 18
+      view.addSubview(tabBar)
+      
+      // Override the horizontal size class to compact
+      traitOverrides.horizontalSizeClass = .compact
+    }
+    
     UINavigationBar.appearance().prefersLargeTitles = true
     
     tabBar.tintColor = .purple
     
-    setupViewControllers()
+    viewControllers = menuItems.map({ item in
+      generateNavigationController(for: item.controller, menu: item.menuItem)
+    })
     
     setupPlayerDetailsView()
   }
@@ -59,6 +95,8 @@ class MainTabBarController: UITabBarController, Rotatable {
     tabBar.transform = .identity
     playerDetailsView.maximizedStackView.alpha = 0
     playerDetailsView.miniPlayerView.alpha = 1
+    
+    tabBar.alpha = 1
   }
   
   func maximizePlayerDetails(episode: Episode?, playlistEpisodes: [Episode] = [], userManual: Bool = false) {
@@ -78,6 +116,8 @@ class MainTabBarController: UITabBarController, Rotatable {
     tabBar.transform = CGAffineTransform(translationX: 0, y: 100)
     playerDetailsView.maximizedStackView.alpha = 1
     playerDetailsView.miniPlayerView.alpha = 0
+    
+    tabBar.alpha = 0
   }
   
   //MARK:- Setup Functions
@@ -99,34 +139,8 @@ class MainTabBarController: UITabBarController, Rotatable {
     
     playerDetailsView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
     playerDetailsView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-  }
-  
-  func setupViewControllers() {
-    let layout = UICollectionViewFlowLayout()
-    let favoritesController = FavoritesController(collectionViewLayout: layout)
-    viewControllers = [
-      generateNavigationController(for: PodcastsSearchController(), menu: MenuItem(
-        title: "Search",
-        remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normaltv_1723520994568.png",
-        remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activetv_1723520483939.png",
-        localImage: #imageLiteral(resourceName: "search"),
-        localImageSelection: #imageLiteral(resourceName: "search"))
-      ),
-      generateNavigationController(for: favoritesController, menu: MenuItem(
-        title: "Favorites",
-        remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normalvod_1723520974422.png",
-        remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activevod_1723520974422.png",
-        localImage: #imageLiteral(resourceName: "favorites"),
-        localImageSelection: #imageLiteral(resourceName: "favorites"))
-      ),
-      generateNavigationController(for: DownloadsController(), menu: MenuItem(
-        title: "Downloads",
-        remoteImage: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/normalsport_1723520924752.png",
-        remoteImageSelection: "https://images.fptplay53.net/media/photo/OTT/2024/08/13/activesport_1723520571475.png",
-        localImage: #imageLiteral(resourceName: "downloads"),
-        localImageSelection: #imageLiteral(resourceName: "downloads"))
-      )
-    ]
+    
+    minimizePlayerDetails()
   }
   
   //MARK:- Helper Functions
@@ -152,4 +166,9 @@ struct MenuItem {
   
   var remoteUIImage: UIImage?
   var remoteUIImageSelection: UIImage?
+}
+
+struct ControllerTabItem {
+  let controller: UIViewController
+  var menuItem: MenuItem
 }
